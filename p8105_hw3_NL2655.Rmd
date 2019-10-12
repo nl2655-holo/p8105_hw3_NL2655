@@ -1,0 +1,13 @@
+---
+title: "HW3"
+author: "Nankun"
+date: "2019/10/13"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+data("instacrt")
+```
+
