@@ -11,3 +11,15 @@ library(p8105.datasets)
 data("instacrt")
 ```
 
+```{r}
+instacart %>% 
+  group_by(aisle_id) %>% 
+  summarize(n=n())
+  
+```
+134 aisles, 3 are most ordered from.
+
+```{r}
+
+```
+
