@@ -5,21 +5,78 @@ date: "2019/10/13"
 output: github_document
 ---
 
+# Homework 3
+
+## Library
 ```{r}
 library(tidyverse)
+library(ggridges)
 library(p8105.datasets)
 data("instacrt")
+
+```
+## Problem 1
+### Number of aisle and the most popular one
+```{r}
+ais_num = 
+  max(pull(instacart,aisle_id))
+ais_num
+instacart %>% 
+  group_by(aisle) %>% 
+  summarize(
+    n_ais = n()
+  ) %>% 
+  arrange(desc(n_ais)) %>% 
+  filter(min_rank(desc(n_ais))<2) %>% 
+  pull(aisle)
 ```
 
+### Plot
 ```{r}
 instacart %>% 
-  group_by(aisle_id) %>% 
-  summarize(n=n())
-  
+  group_by(aisle) %>% 
+  summarize(
+    n_ais = n()
+  ) %>% 
+  filter(n_ais > 10000) %>% 
+  ggplot(aes(x = aisle, y = n_ais)) +
+  geom_point() +
+  labs(
+    title = "Aisle orders plot",
+    x = "Aisle names",
+    y = "Order amount",
+    caption = "Data from instacart"
+  ) +
+  ggthemes::theme_excel()+
+  theme(axis.text.x = element_text(angle = 90,hjust=1))
 ```
-134 aisles, 3 are most ordered from.
 
+### 3 most popular in three aisles
 ```{r}
+instacart %>% 
+  filter(aisle == c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(
+    sum = sum(order_number)
+  ) %>% 
+filter(min_rank(desc(sum))<=3) %>% 
+  arrange(desc(sum)) %>% 
+ knitr::kable()
+```
 
+### Table
+```{r}
+  instacart %>% 
+  filter(product_name == c("Pink Lady Apples", "Coffee Ice Cream")) %>%
+  group_by(product_name, order_dow) %>% 
+  summarize(
+   ohd_mean = mean(order_hour_of_day)
+  ) %>% 
+    pivot_wider(
+    names_from = order_dow,
+    values_from = ohd_mean,
+  ) %>% 
+  mutate(order_dow = recode(order_dow, "0" = "Sun", "1" = "Mon", "2" = "Tue", "3" = "Wed", "4" = "Thu", "5" = "Fri", "6" = "Sat")) %>% 
+   knitr::kable()
 ```
 
