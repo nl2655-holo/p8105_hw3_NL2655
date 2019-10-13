@@ -11,14 +11,14 @@ output: github_document
 ```{r}
 library(tidyverse)
 library(ggridges)
+library(patchwork)
+library(readr)
 library(p8105.datasets)
-data("instacrt")
-data("BRFSS")
-
 ```
 ## Problem 1
 ### Number of aisle and the most popular one
 ```{r}
+data("instacart")
 ais_num = 
   max(pull(instacart,aisle_id))
 ais_num
@@ -55,7 +55,7 @@ instacart %>%
 ### 3 most popular in three aisles
 ```{r}
 instacart %>% 
-  filter(aisle == c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
+  filter(aisle == "baking ingredients"|aisle ==  "dog food care"|aisle ==  "packaged vegetables fruits") %>% 
   group_by(aisle, product_name) %>% 
   summarize(
     sum = sum(order_number)
@@ -68,7 +68,7 @@ filter(min_rank(desc(sum))<=3) %>%
 ### Table
 ```{r}
   instacart %>% 
-  filter(product_name == c("Pink Lady Apples", "Coffee Ice Cream")) %>%
+  filter(product_name == "Pink Lady Apples"|product_name ==  "Coffee Ice Cream") %>%
   group_by(product_name, order_dow) %>% 
   summarize(
    ohd_mean = mean(order_hour_of_day)
@@ -79,7 +79,7 @@ filter(min_rank(desc(sum))<=3) %>%
      ) %>% 
     pivot_wider(
     names_from = order_dow,
-    values_from = ohd_mean,
+    values_from = ohd_mean
   ) %>% 
    knitr::kable()
 ```
@@ -87,20 +87,135 @@ filter(min_rank(desc(sum))<=3) %>%
 ## Problem 2
 ### Data cleaning
 ```{r}
+data("brfss_smart2010")
 brfss_td = 
   brfss_smart2010 %>% 
   janitor::clean_names() %>% 
   filter(
     topic == "Overall Health") %>% 
-  filter(
-    response == c("Excellent", "Fair", "Good", "Poor", "Very good")
-    ) %>% 
-  mutate(response=forcats::fct_relevel(response,
-                                       c("Poor",
-                                         "Fair",
-                                         "Good",
-                                         "Very good",
-                                         "Excellent")))
+    filter(response=="Excellent"|response=="Very good"|
+           response=="Good"|response=="Fair"|
+           response=="Poor") %>% 
+  mutate(
+    response = fct_relevel(response, "Poor", "Fair", "Good", "Very good", "Excellent")
+  )
 brfss_td
+```
+
+### State observed
+```{r}
+brfss_td %>% 
+  filter(year==2010|year==2002) %>% 
+  group_by(year, locationabbr) %>% 
+  summarize(
+    obsd = n()
+  ) %>% 
+    filter(obsd >= 7) %>% 
+  pivot_wider(
+    names_from = year,
+    values_from = obsd
+  )
+```
+
+### spaghetti plot
+```{r}
+brfss_td %>% 
+  filter(response == "Excellent") %>% 
+  group_by(year, locationabbr, locationdesc) %>% 
+  summarize(
+    ave_val = mean(data_value, na.rm = TRUE),
+  ) %>% 
+  ggplot(aes(x = year, y = ave_val)) + 
+  geom_point() + 
+  geom_line(aes(group = locationabbr))+
+  labs(
+    y="average of data value",
+    title = "average value over time within a state"
+  )
+```
+
+### two panel plot
+```{r}
+plot_2006 =
+  brfss_td %>%
+  filter(year == "2006") %>% 
+  ggplot(aes(x = response, y = data_value)) + 
+  geom_violin(aes(fill = response), color = "blue", alpha = .5) + 
+  labs(
+    title = "2006 distribution of data value",
+    y = "data value"
+    )+
+  theme(legend.position = "none")
+plot_2010 =
+  brfss_td %>%
+  filter(year == "2010") %>% 
+  ggplot(aes(x = response, y = data_value)) + 
+  geom_violin(aes(fill = response), color = "blue", alpha = .5) +
+  labs(
+    title = "2010 distribution of data value",
+    y = "data value"
+    )+
+  theme(legend.position = "none")
+plot_2006 / plot_2010
+```
+
+## Problem 3
+### data import and cleaning
+```{r}
+accel = read_csv("data/accel_data.csv")
+accel_td = 
+  accel %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "min_act",
+    names_prefix = "activity_",
+    values_to = "activity_counts") %>% 
+  mutate(
+    weekday = recode(day,
+      "Friday" = "Weekday",
+      "Monday" = "Weekday",
+      "Tuesday" = "Weekday",
+      "Wednesday" = "Weekday",
+      "Thursday" = "Weekday",
+      "Saturday" = "Weekend",
+      "Sunday" = "Weekend"
+    )
+  )
+accel_td
+accel_td %>% 
+  count(day, weekday)
+```
+
+##Description##
+
+### Traditional analyses
+```{r}
+accel_day =
+accel_td %>% 
+  group_by(day_id, day, weekday) %>% 
+  summarize(
+    day_act_counts = sum(activity_counts)
+  )
+  knitr::kable(accel_day)
+```
+
+##trand##
+
+### plot
+```{r}
+accel_day %>% 
+  ggplot(aes(x = day_id, y = day_act_counts)) + 
+  geom_point(aes(color = day), alpha = .5)+
+  geom_line(aes(color = day))+
+  labs(
+    title = "activity by day plot",
+    x = "day",
+    y = "activity counts",
+    caption = "from accel data"
+  )+
+   scale_y_continuous(
+    breaks = c(0, 200000, 400000, 600000), 
+    labels = c("0", "20k", "40k", "60k"))
 ```
 
