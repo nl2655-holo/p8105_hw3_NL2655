@@ -72,11 +72,14 @@ filter(min_rank(desc(sum))<=3) %>%
   summarize(
    ohd_mean = mean(order_hour_of_day)
   ) %>% 
+   mutate(
+     order_dow = recode(order_dow, "0" = "Sun", "1" = "Mon", "2" = "Tue", "3" = "Wed", "4" = "Thu", "5" = "Fri", "6" = "Sat"),
+     ohd_mean = round(ohd_mean, 2)
+     ) %>% 
     pivot_wider(
     names_from = order_dow,
     values_from = ohd_mean,
   ) %>% 
-  mutate(order_dow = recode(order_dow, "0" = "Sun", "1" = "Mon", "2" = "Tue", "3" = "Wed", "4" = "Thu", "5" = "Fri", "6" = "Sat")) %>% 
    knitr::kable()
 ```
 
