@@ -13,6 +13,7 @@ library(tidyverse)
 library(ggridges)
 library(p8105.datasets)
 data("instacrt")
+data("BRFSS")
 
 ```
 ## Problem 1
@@ -81,5 +82,25 @@ filter(min_rank(desc(sum))<=3) %>%
     values_from = ohd_mean,
   ) %>% 
    knitr::kable()
+```
+
+## Problem 2
+### Data cleaning
+```{r}
+brfss_td = 
+  brfss_smart2010 %>% 
+  janitor::clean_names() %>% 
+  filter(
+    topic == "Overall Health") %>% 
+  filter(
+    response == c("Excellent", "Fair", "Good", "Poor", "Very good")
+    ) %>% 
+  mutate(response=forcats::fct_relevel(response,
+                                       c("Poor",
+                                         "Fair",
+                                         "Good",
+                                         "Very good",
+                                         "Excellent")))
+brfss_td
 ```
 
