@@ -22,6 +22,7 @@ data("instacart")
 ais_num = 
   max(pull(instacart,aisle_id))
 ais_num
+pop_ais=
 instacart %>% 
   group_by(aisle) %>% 
   summarize(
@@ -30,7 +31,11 @@ instacart %>%
   arrange(desc(n_ais)) %>% 
   filter(min_rank(desc(n_ais))<2) %>% 
   pull(aisle)
+pop_ais
 ```
+
+**Answer**:
+There are `r  max(pull(instacart,aisle_id))` aisle and fresh vegetable is the most item ordered from.
 
 ### Plot
 ```{r}
@@ -52,6 +57,9 @@ instacart %>%
   theme(axis.text.x = element_text(angle = 90,hjust=1))
 ```
 
+**Answer**:
+The plot is showing above, including the order count for all aisles with more than 10000 items ordered.
+
 ### 3 most popular in three aisles
 ```{r}
 instacart %>% 
@@ -64,6 +72,9 @@ filter(min_rank(desc(sum))<=3) %>%
   arrange(desc(sum)) %>% 
  knitr::kable()
 ```
+
+**Answer**:
+Table is showing above, including the 3 most popular items in “baking ingredients”, “dog food care”, and “packaged vegetables fruits” aisle.
 
 ### Table
 ```{r}
@@ -83,6 +94,12 @@ filter(min_rank(desc(sum))<=3) %>%
   ) %>% 
    knitr::kable()
 ```
+
+**Answer**:
+The table is showing above, including the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week.
+
+**Description**:
+Data *instacart* from *library(p8105.datasets)* contains `r nrow(instacart)` observations with `r length(names(instacart))` variables about the order status of items.The key varibles we used in data analysis includes *aisle_id*, *aisle*, *product_nam*, *order_dow*, *order_hour_of_day*, and *order_number*. These variables are analysed to get aisle number, the aisle which most items are ordered from, making plots about the number of items ordered in each aisle with more than 10000 items ordered, making table about the most popular items in “baking ingredients”, “dog food care”, and “packaged vegetables fruits” aisles, and making table showing that mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week.
 
 ## Problem 2
 ### Data cleaning
@@ -116,6 +133,9 @@ brfss_td %>%
     values_from = obsd
   )
 ```
+
+*Answer*:
+The states observed equal or more than 7 times in both 2002 and 2010 are shown above.
 
 ### spaghetti plot
 ```{r}
