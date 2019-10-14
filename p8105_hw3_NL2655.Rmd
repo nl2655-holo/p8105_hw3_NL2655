@@ -162,9 +162,10 @@ brfss_td %>%
 ```{r}
 plot_2006 =
   brfss_td %>%
-  filter(year == "2006") %>% 
-  ggplot(aes(x = response, y = data_value)) + 
-  geom_violin(aes(fill = response), color = "blue", alpha = .5) + 
+  filter(year == "2006"& locationabbr == "NY") %>% 
+  ggplot(aes(x = locationdesc, y = data_value, fill = response)) + 
+  geom_bar(stat = "identity", position = "fill") + 
+  coord_flip()+
   labs(
     title = "2006 distribution of data value",
     y = "data value"
@@ -172,9 +173,10 @@ plot_2006 =
   theme(legend.position = "none")
 plot_2010 =
   brfss_td %>%
-  filter(year == "2010") %>% 
-  ggplot(aes(x = response, y = data_value)) + 
-  geom_violin(aes(fill = response), color = "blue", alpha = .5) +
+  filter(year == "2010"& locationabbr == "NY") %>% 
+  ggplot(aes(x = locationdesc, y = data_value, fill = response)) + 
+  geom_bar(stat = "identity", position = "fill") + 
+  coord_flip()+
   labs(
     title = "2010 distribution of data value",
     y = "data value"
@@ -184,7 +186,7 @@ plot_2006 / plot_2010
 ```
 
 *Answer*:
-Two-panel plot is above showing that for the years 2006, and 2010, distribution of *data_value* for responses (“Poor” to “Excellent”) among locations in NY State, by patchwork. We can see that the plot in 2006 has similiar distribution comparing to plot in 2010.
+Two-panel plot is above showing that for the years 2006, and 2010, distribution of *data_value* for responses from Poor to Excellent among locations in NY State, by patchwork. We can see that the plot in 2006 has similiar distribution comparing to plot in 2010, barchart are used to show the distribution readly.
 
 ## Problem 3
 ### data import and cleaning
