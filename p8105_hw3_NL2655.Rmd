@@ -123,10 +123,11 @@ brfss_td
 ```{r}
 brfss_td %>% 
   filter(year==2010|year==2002) %>% 
-  group_by(year, locationabbr) %>% 
+  group_by(year, locationabbr,locationdesc) %>% 
   summarize(
-    obsd = n()
+    n = n()
   ) %>% 
+    count(locationabbr,name = "obsd") %>% 
     filter(obsd >= 7) %>% 
   pivot_wider(
     names_from = year,
@@ -135,7 +136,7 @@ brfss_td %>%
 ```
 
 *Answer*:
-The states observed equal or more than 7 times in both 2002 and 2010 are shown above.
+The states observed equal or more than 7 times in both 2002 and 2010 are shown above.There are 6 state have observed equal or more than 7 times in 2002, but much more in 2010.
 
 ### spaghetti plot
 ```{r}
@@ -153,6 +154,9 @@ brfss_td %>%
     title = "average value over time within a state"
   )
 ```
+
+*Answer*:
+“spaghetti” plot of this average value over time within a state is made above.
 
 ### two panel plot
 ```{r}
@@ -178,6 +182,9 @@ plot_2010 =
   theme(legend.position = "none")
 plot_2006 / plot_2010
 ```
+
+*Answer*:
+Two-panel plot is above showing that for the years 2006, and 2010, distribution of *data_value* for responses (“Poor” to “Excellent”) among locations in NY State, by patchwork. We can see that the plot in 2006 has similiar distribution comparing to plot in 2010.
 
 ## Problem 3
 ### data import and cleaning
@@ -207,7 +214,8 @@ accel_td %>%
   count(day, weekday)
 ```
 
-##Description##
+*Description*
+Data *accel_td* from *accel_data.csv* contains `r nrow(accel_td)` observations with `r length(names(accel_td))` variables about the activity counts for each minute of a 24-hour day starting at midnight for a observer aged 63 and BMI 25.The key varibles we used in data analysis includes *week*, *day_id*, *day*, *min_act*, *activity_counts*, *weekday*, and created variable *day_act_counts*. These variables are analysed to reveal the trends of dayily activity counts.
 
 ### Traditional analyses
 ```{r}
@@ -220,7 +228,8 @@ accel_td %>%
   knitr::kable(accel_day)
 ```
 
-##trand##
+*Trend*
+I do not see much trend here, the only trend I see is that the Saturday counts in last two weeks are very low.
 
 ### plot
 ```{r}
@@ -239,3 +248,5 @@ accel_day %>%
     labels = c("0", "20k", "40k", "60k"))
 ```
 
+*Trend*
+From plot, we can see that the activity counts in weekdays are kept almost the same, but the counts of activity in weekends drop obveriously.
